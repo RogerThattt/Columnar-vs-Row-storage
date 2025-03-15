@@ -1,0 +1,18 @@
+from pyspark.ml.classification import LogisticRegression
+from pyspark.ml.feature import VectorAssembler
+from pyspark.sql.functions import when
+
+# Prepare data (convert categorical to numerical)
+order_df = order_df.withColumn("status_numeric", when(col("status") == "Failed", 1).otherwise(0))
+
+# Assemble features
+assembler = VectorAssembler(inputCols=["status_numeric"], outputCol="features")
+training_data = assembler.transform(order_df)
+
+# Train model
+lr = LogisticRegression(featuresCol="features", labelCol="status_numeric")
+model = lr.fit(training_data)
+
+# Predict future failures
+predictions = model.transform(training_data)
+predictions.show()

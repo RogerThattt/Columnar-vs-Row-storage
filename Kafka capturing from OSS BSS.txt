@@ -1,0 +1,21 @@
+from kafka import KafkaProducer
+import json
+import time
+
+producer = KafkaProducer(
+    bootstrap_servers='localhost:9092',
+    value_serializer=lambda v: json.dumps(v).encode('utf-8')
+)
+
+# Simulated failed orders
+failed_orders = [
+    {"order_id": 1001, "status": "Failed", "reason": "Address Error", "timestamp": "2025-03-15T12:00:00"},
+    {"order_id": 1002, "status": "Failed", "reason": "Inventory Issue", "timestamp": "2025-03-15T12:05:00"},
+    {"order_id": 1003, "status": "Completed", "reason": "N/A", "timestamp": "2025-03-15T12:10:00"},
+]
+
+for order in failed_orders:
+    producer.send('order_fallout', value=order)
+    time.sleep(1)
+
+producer.close()

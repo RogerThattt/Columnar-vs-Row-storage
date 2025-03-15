@@ -1,0 +1,6 @@
+-- Query to analyze top failure reasons
+SELECT reason, COUNT(*) as failure_count 
+FROM delta.`/mnt/delta/order_fallout`
+WHERE status = 'Failed'
+GROUP BY reason
+ORDER BY failure_count DESC;
